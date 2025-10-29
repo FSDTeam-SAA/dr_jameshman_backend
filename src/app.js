@@ -3,6 +3,7 @@ import cors from "cors";
 import treatmentListRouter from "./routes/treatmentList.routes.js";
 import contactRouter from "./routes/contact.routes.js";
 import faqRouter from "./routes/faq.routes.js";
+import treatmentFeeRouter from "./routes/treatmentFees.routes.js";
 
 const app = express();
 
@@ -23,5 +24,8 @@ app.use("/api/v1/contacts", contactRouter);
 
 //  faq routes
 app.use("/api/v1/faqs", faqRouter);
+
+// treatment fee routes
+app.use("/api/v1/treatmentfees", treatmentFeeRouter);
 
 export default app;
