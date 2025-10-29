@@ -4,6 +4,7 @@ import treatmentListRouter from "./routes/treatmentList.routes.js";
 import contactRouter from "./routes/contact.routes.js";
 import faqRouter from "./routes/faq.routes.js";
 import treatmentFeeRouter from "./routes/treatmentFees.routes.js";
+import bookingRouter from "./routes/booking.routes.js";
 
 const app = express();
 
@@ -27,5 +28,8 @@ app.use("/api/v1/faqs", faqRouter);
 
 // treatment fee routes
 app.use("/api/v1/treatmentfees", treatmentFeeRouter);
+
+// booking routes
+app.use("/api/v1/bookings", bookingRouter);
 
 export default app;
