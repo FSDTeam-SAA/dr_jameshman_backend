@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import treatmentListRouter from "./routes/treatmentList.routes.js";
 import contactRouter from "./routes/contact.routes.js";
+import faqRouter from "./routes/faq.routes.js";
 
 const app = express();
 
@@ -19,5 +20,8 @@ app.use("/api/v1/treatments", treatmentListRouter);
 
 // contact routes
 app.use("/api/v1/contacts", contactRouter);
+
+//  faq routes
+app.use("/api/v1/faqs", faqRouter);
 
 export default app;
