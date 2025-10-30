@@ -5,6 +5,7 @@ import contactRouter from "./routes/contact.routes.js";
 import faqRouter from "./routes/faq.routes.js";
 import treatmentFeeRouter from "./routes/treatmentFees.routes.js";
 import bookingRouter from "./routes/booking.routes.js";
+import galleryRouter from "./routes/gallery.routes.js";
 
 const app = express();
 
@@ -31,5 +32,8 @@ app.use("/api/v1/treatmentfees", treatmentFeeRouter);
 
 // booking routes
 app.use("/api/v1/bookings", bookingRouter);
+
+// gallery routes
+app.use("/api/v1/galleries", galleryRouter);
 
 export default app;
