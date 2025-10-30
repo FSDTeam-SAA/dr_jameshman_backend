@@ -7,6 +7,7 @@ import treatmentFeeRouter from "./routes/treatmentFees.routes.js";
 import bookingRouter from "./routes/booking.routes.js";
 import galleryRouter from "./routes/gallery.routes.js";
 import userRouter from "./routes/user.routes.js";
+import referralRouter from "./routes/referral.routes.js";
 
 const app = express();
 
@@ -39,5 +40,8 @@ app.use("/api/v1/galleries", galleryRouter);
 
 // user routes
 app.use("/api/v1/users", userRouter);
+
+// referral routes
+app.use("/api/v1/referrals", referralRouter);
 
 export default app;

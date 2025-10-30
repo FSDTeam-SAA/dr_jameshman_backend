@@ -40,15 +40,6 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    const phoneRegex = /^\+?[0-9]{7,15}$/;
-    if (!phoneRegex.test(phoneNumber)) {
-      return res.status(400).json({
-        status: false,
-        message: "Please provide a valid phone number",
-        data: null,
-      });
-    }
-
     if (consent !== true) {
       return res.status(400).json({
         status: false,
