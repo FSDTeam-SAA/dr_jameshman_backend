@@ -6,6 +6,7 @@ import faqRouter from "./routes/faq.routes.js";
 import treatmentFeeRouter from "./routes/treatmentFees.routes.js";
 import bookingRouter from "./routes/booking.routes.js";
 import galleryRouter from "./routes/gallery.routes.js";
+import userRouter from "./routes/user.routes.js";
 
 const app = express();
 
@@ -24,7 +25,7 @@ app.use("/api/v1/treatments", treatmentListRouter);
 // contact routes
 app.use("/api/v1/contacts", contactRouter);
 
-//  faq routes
+// faq routes
 app.use("/api/v1/faqs", faqRouter);
 
 // treatment fee routes
@@ -35,5 +36,8 @@ app.use("/api/v1/bookings", bookingRouter);
 
 // gallery routes
 app.use("/api/v1/galleries", galleryRouter);
+
+// user routes
+app.use("/api/v1/users", userRouter);
 
 export default app;
