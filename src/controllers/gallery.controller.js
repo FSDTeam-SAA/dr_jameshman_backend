@@ -147,3 +147,119 @@ export const deleteGallery = async (req, res) => {
     });
   }
 };
+
+// update gallery
+// export const updateGallery = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const { imageName, imageDescription } = req.body;
+
+//     const gallery = await Gallery.findById(id);
+//     console.log(gallery);
+//     if (!gallery) {
+//       if (req.file && fs.existsSync(req.file.path))
+//         fs.unlinkSync(req.file.path);
+//       return res.status(404).json({
+//         status: false,
+//         message: "Gallery not found",
+//         data: null,
+//       });
+//     }
+
+//     const updateFields = {};
+//     if (imageName) updateFields.imageName = imageName;
+//     if (imageDescription) updateFields.imageDescription = imageDescription;
+
+//     if (req.file) {
+//       const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+//         folder: "gallery",
+//         resource_type: "image",
+//       });
+
+//       fs.unlinkSync(req.file.path);
+
+//       if (gallery.cloudinaryId) {
+//         await cloudinary.uploader.destroy(gallery.cloudinaryId);
+//       }
+
+//       updateFields.imageUrl = uploadResult.secure_url;
+//       updateFields.cloudinaryId = uploadResult.public_id;
+//     }
+
+//     const updatedGallery = await Gallery.findByIdAndUpdate(id, updateFields, {
+//       new: true,
+//       runValidators: true,
+//     });
+
+//     return res.status(200).json({
+//       status: true,
+//       message: "Gallery updated successfully",
+//       data: updatedGallery,
+//     });
+//   } catch (error) {
+//     if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+//     return res.status(500).json({
+//       status: false,
+//       message: "Error updating gallery",
+//       data: error.message,
+//     });
+//   }
+// };
+
+export const updateGallery = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const imageName = req.body?.imageName || null;
+    const imageDescription = req.body?.imageDescription || null;
+
+    const gallery = await Gallery.findById(id);
+    if (!gallery) {
+      if (req.file && fs.existsSync(req.file.path))
+        fs.unlinkSync(req.file.path);
+      return res.status(404).json({
+        status: false,
+        message: "Gallery not found",
+        data: null,
+      });
+    }
+
+    const updateFields = {};
+
+    if (imageName) updateFields.imageName = imageName;
+    if (imageDescription) updateFields.imageDescription = imageDescription;
+
+    if (req.file) {
+      const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+        folder: "gallery",
+        resource_type: "image",
+      });
+
+      fs.unlinkSync(req.file.path);
+
+      if (gallery.cloudinaryId) {
+        await cloudinary.uploader.destroy(gallery.cloudinaryId);
+      }
+
+      updateFields.imageUrl = uploadResult.secure_url;
+      updateFields.cloudinaryId = uploadResult.public_id;
+    }
+
+    const updatedGallery = await Gallery.findByIdAndUpdate(id, updateFields, {
+      new: true,
+      runValidators: true,
+    });
+
+    return res.status(200).json({
+      status: true,
+      message: "Gallery updated successfully",
+      data: updatedGallery,
+    });
+  } catch (error) {
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    return res.status(500).json({
+      status: false,
+      message: "Error updating gallery",
+      data: error.message,
+    });
+  }
+};
