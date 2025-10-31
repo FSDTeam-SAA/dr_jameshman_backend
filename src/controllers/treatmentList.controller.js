@@ -1,64 +1,38 @@
 import TreatmentList from "../models/treatmentList.model.js";
+import TreatmentCategory from "../models/treatmentCategory.model.js";
+import cloudinary from "cloudinary";
 
 // create treatment list
 export const createTreatmentList = async (req, res) => {
   try {
-    const { treatments } = req.body;
+    const { categoryId, treatments } = req.body;
 
-    if (!Array.isArray(treatments) || treatments.length === 0) {
-      return res.status(400).json({ message: "Treatments array is required" });
-    }
+    const category = await TreatmentCategory.findById(categoryId);
+    if (!category)
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
 
-    for (const treatment of treatments) {
-      if (!treatment.serviceName || treatment.serviceName.trim() === "") {
-        return res.status(400).json({
-          status: false,
-          message: "Each treatment must have a serviceName",
-          data: null,
+    const parsedTreatments = JSON.parse(treatments);
+
+    for (let item of parsedTreatments) {
+      if (item.imageFile) {
+        const upload = await cloudinary.uploader.upload(item.imageFile.path, {
+          folder: "treatmentList",
         });
+        item.image = upload.secure_url;
       }
     }
 
-    const serviceNames = treatments.map((treatment) =>
-      treatment.serviceName.trim()
-    );
-    const uniqueServiceNames = new Set(serviceNames);
-
-    if (serviceNames.length !== uniqueServiceNames.size) {
-      return res.status(400).json({
-        status: false,
-        message:
-          "Duplicate service names are not allowed in the same treatment list",
-        data: null,
-      });
-    }
-
-    const existingTreatments = await TreatmentList.find({
-      "treatments.serviceName": { $in: serviceNames },
+    const treatmentList = new TreatmentList({
+      category: categoryId,
+      treatments: parsedTreatments,
     });
 
-    if (existingTreatments.length > 0) {
-      return res.status(400).json({
-        status: false,
-        message: "Duplicate service name is not allowed",
-        data: null,
-      });
-    }
-
-    const newTreatmentList = new TreatmentList({ treatments });
-
-    await newTreatmentList.save();
-
-    return res.status(201).json({
-      status: true,
-      message: "Treatment list created successfully",
-      data: newTreatmentList,
-    });
-  } catch (err) {
-    console.error(err);
-    return res
-      .status(500)
-      .json({ message: "Server error", error: err.message });
+    await treatmentList.save();
+    res.status(201).json({ success: true, data: treatmentList });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -205,5 +179,5 @@ export const editTreatmentList = async (req, res) => {
   //       data: err.message,
   //     });
   // }
-  console.log("hello")
+  console.log("hello");
 };

@@ -1,23 +1,21 @@
 import mongoose from "mongoose";
 
-const treatmentCategorySchema = new mongoose.Schema(
+const { Schema, model } = mongoose;
+
+const treatmentCategorySchema = new Schema(
   {
-    treatmentCategory: {
+    name: {
       type: String,
-      required: [true, "Treatment category name is required"],
+      required: [true, "Treatment catyegory anme is required"],
       unique: true,
       trim: true,
     },
-    treatmentList: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "TreatmentList",
+    image: {
+      type: String,
+      required: [true, "Treatment category image is required"],
     },
   },
   { timestamps: true }
 );
 
-const TreatmentCategory =
-  mongoose.models.TreatmentCategory ||
-  mongoose.model("TreatmentCategory", treatmentCategorySchema);
-
-export default TreatmentCategory;
+export default model("TreatmentCategory", treatmentCategorySchema);
