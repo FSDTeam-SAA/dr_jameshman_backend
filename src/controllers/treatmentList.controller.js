@@ -8,7 +8,6 @@ export const createTreatmentList = async (req, res) => {
   try {
     const { title, serviceName, description, category } = req.body;
 
-    // Validate required fields
     if (!title || !serviceName || !description || !category) {
       return res.status(400).json({
         status: false,
@@ -17,7 +16,6 @@ export const createTreatmentList = async (req, res) => {
       });
     }
 
-    // Check if image file is uploaded
     if (!req.file) {
       return res.status(400).json({
         status: false,
@@ -26,10 +24,9 @@ export const createTreatmentList = async (req, res) => {
       });
     }
 
-    // Verify category exists (optional but recommended)
     const categoryExists = await TreatmentCategory.findById(category);
     if (!categoryExists) {
-      fs.unlinkSync(req.file.path); // delete uploaded file if invalid
+      fs.unlinkSync(req.file.path);
       return res.status(404).json({
         status: false,
         message: "Category not found",
@@ -39,15 +36,12 @@ export const createTreatmentList = async (req, res) => {
 
     const localFilePath = req.file.path;
 
-    // Upload to Cloudinary
     const uploadResult = await cloudinary.uploader.upload(localFilePath, {
       folder: "treatments",
     });
 
-    // Delete image from local server after upload
     fs.unlinkSync(localFilePath);
 
-    // Save to DB
     const treatment = await TreatmentList.create({
       title,
       serviceName,
@@ -65,7 +59,6 @@ export const createTreatmentList = async (req, res) => {
   } catch (error) {
     console.error("Error creating treatment:", error);
 
-    // Cleanup uploaded file if something fails before unlink
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
@@ -210,10 +203,8 @@ export const deleteTreatmentList = async (req, res) => {
       });
     }
 
-    // Delete from Cloudinary
     await cloudinary.uploader.destroy(treatment.cloudinaryId);
 
-    // Delete from DB
     await TreatmentList.findByIdAndDelete(id);
 
     return res.status(200).json({
@@ -226,6 +217,78 @@ export const deleteTreatmentList = async (req, res) => {
       status: false,
       message: "Server error while deleting treatment",
       data: err.message,
+    });
+  }
+};
+
+//  get treatment list by category Id
+// export const getTreatmentListByCategory = async (req, res) => {
+//  try {
+//     const { categoryId } = req.params;
+
+//     const category = await TreatmentCategory.findById(categoryId);
+//     if (!category) {
+//       return res.status(404).json({
+//         status: false,
+//         message: "Category not found",
+//         data: null,
+//       });
+//     }
+
+//     const treatments = await TreatmentList.find({ category: categoryId }).sort({ createdAt: -1 });
+
+//     return res.status(200).json({
+//       status: true,
+//       message: "Treatments fetched successfully for this category",
+//       data: {
+//         category,
+//         treatments,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error fetching treatments by category:", error);
+//     return res.status(500).json({
+//       status: false,
+//       message: "Server error while fetching treatments",
+//       data: error.message,
+//     });
+//   }
+// };
+
+export const getTreatmentListByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+
+    // 1️⃣ Check if category exists
+    const category = await TreatmentCategory.findById(categoryId);
+    if (!category) {
+      return res.status(404).json({
+        status: false,
+        message: "Treatment category not found",
+        data: null,
+      });
+    }
+
+    // 2️⃣ Find all treatments associated with this category
+    const treatments = await TreatmentList.find({ category: categoryId })
+      .populate("category", "name image") // optional: include category info
+      .sort({ createdAt: -1 });
+
+    // 3️⃣ Return response
+    return res.status(200).json({
+      status: true,
+      message: "Treatments fetched successfully for this category",
+      data: {
+        category,
+        treatments,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching treatments by category:", error);
+    return res.status(500).json({
+      status: false,
+      message: "Server error while fetching treatments by category",
+      data: error.message,
     });
   }
 };
