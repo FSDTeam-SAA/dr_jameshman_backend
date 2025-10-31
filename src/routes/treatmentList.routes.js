@@ -1,15 +1,23 @@
 import { Router } from "express";
 import {
   createTreatmentList,
-  editTreatmentList,
-  getTreatmentLists,
+  deleteTreatmentList,
+  getAllTreatmentList,
+  getSingleTreatmentList,
+  updateTreatmentList,
 } from "../controllers/treatmentList.controller.js";
+import upload from "../middleware/multer.js";
 
 const router = Router();
 
-// routes
-router.route("/create-treatmentList").post(createTreatmentList);
-router.route("/edit-treatmentList").put(editTreatmentList);
-router.route("/").get(getTreatmentLists);
+router
+  .route("/")
+  .post(upload.single("image"), createTreatmentList)
+  .get(getAllTreatmentList);
+router
+  .route("/:id")
+  .get(getSingleTreatmentList)
+  .put(upload.single("image"), updateTreatmentList)
+  .delete(deleteTreatmentList);
 
 export default router;

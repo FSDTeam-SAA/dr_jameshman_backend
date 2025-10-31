@@ -1,125 +1,131 @@
+import fs from "fs";
+import TreatmentCategory from "../models/treatmentCategory.model.js"
 import TreatmentList from "../models/treatmentList.model.js";
-import TreatmentCategory from "../models/treatmentCategory.model.js";
-import cloudinary from "cloudinary";
+import cloudinary from '../utils/cloudinary.js'
 
 // create treatment list
 export const createTreatmentList = async (req, res) => {
   try {
-    const { categoryId, treatments } = req.body;
+    const { title, serviceName, description, category } = req.body;
 
-    const category = await TreatmentCategory.findById(categoryId);
-    if (!category)
-      return res
-        .status(404)
-        .json({ success: false, message: "Category not found" });
-
-    const parsedTreatments = JSON.parse(treatments);
-
-    for (let item of parsedTreatments) {
-      if (item.imageFile) {
-        const upload = await cloudinary.uploader.upload(item.imageFile.path, {
-          folder: "treatmentList",
-        });
-        item.image = upload.secure_url;
-      }
-    }
-
-    const treatmentList = new TreatmentList({
-      category: categoryId,
-      treatments: parsedTreatments,
-    });
-
-    await treatmentList.save();
-    res.status(201).json({ success: true, data: treatmentList });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-//  get all treatment list
-export const getTreatmentLists = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-
-    const skip = (page - 1) * limit;
-
-    const treatmentLists = await TreatmentList.find()
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 });
-
-    const totalCount = await TreatmentList.countDocuments();
-
-    const totalPages = Math.ceil(totalCount / limit);
-
-    // Respond with the treatment lists and pagination info
-    return res.status(200).json({
-      status: true,
-      message: "Treatment lists fetched successfully",
-      data: treatmentLists,
-      pagination: {
-        currentPage: page,
-        totalPages: totalPages,
-        totalItems: totalCount,
-        itemsPerPage: limit,
-      },
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({
-      staus: false,
-      message: "Server error",
-      error: err.message,
-      data: nul,
-    });
-  }
-};
-
-// get an individual treatment list
-export const getIndividualTreatment = async (req, res) => {
-  try {
-    const { listId, treatmentId } = req.params;
-
-    const treatmentList = await TreatmentList.findById(listId);
-
-    if (!treatmentList) {
-      return res.status(404).json({
+    // Validate required fields
+    if (!title || !serviceName || !description || !category) {
+      return res.status(400).json({
         status: false,
-        message: "Treatment list not found",
+        message: "All fields (title, serviceName, description, category) are required",
         data: null,
       });
     }
 
-    let treatment;
-    if (treatmentId) {
-      if (Number.isInteger(parseInt(treatmentId))) {
-        const treatmentIndex = parseInt(treatmentId);
-        treatment = treatmentList.treatments[treatmentIndex];
+    // Check if image file is uploaded
+    if (!req.file) {
+      return res.status(400).json({
+        status: false,
+        message: "Image file is required",
+        data: null,
+      });
+    }
 
-        if (!treatment) {
-          return res.status(404).json({
-            status: false,
-            message: "Treatment not found at this index",
-            data: null,
-          });
-        }
-      } else {
-        treatment = treatmentList.treatments.find(
-          (t) => t.serviceName === treatmentId
-        );
-        if (!treatment) {
-          return res.status(404).json({
-            status: false,
-            message: "Treatment with this serviceName not found",
-            data: null,
-          });
-        }
-      }
-    } else {
-      return res
-        .status(400)
-        .json({ message: "Treatment identifier is required" });
+    // Verify category exists (optional but recommended)
+    const categoryExists = await TreatmentCategory.findById(category);
+    if (!categoryExists) {
+      fs.unlinkSync(req.file.path); // delete uploaded file if invalid
+      return res.status(404).json({
+        status: false,
+        message: "Category not found",
+        data: null,
+      });
+    }
+
+    const localFilePath = req.file.path;
+
+    // Upload to Cloudinary
+    const uploadResult = await cloudinary.uploader.upload(localFilePath, {
+      folder: "treatments",
+    });
+
+    // Delete image from local server after upload
+    fs.unlinkSync(localFilePath);
+
+    // Save to DB
+    const treatment = await TreatmentList.create({
+      title,
+      serviceName,
+      description,
+      image: uploadResult.secure_url,
+      cloudinaryId: uploadResult.public_id,
+      category,
+    });
+
+    return res.status(201).json({
+      status: true,
+      message: "Treatment created successfully",
+      data: treatment,
+    });
+  } catch (error) {
+    console.error("Error creating treatment:", error);
+
+    // Cleanup uploaded file if something fails before unlink
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+
+    return res.status(500).json({
+      status: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+// get all treatment list
+export const getAllTreatmentList = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const totalTreatments = await TreatmentList.countDocuments();
+    const totalPages = Math.ceil(totalTreatments / limit);
+
+    const treatments = await TreatmentList.find()
+      .populate("category", "name image")
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      status: true,
+      message: "Treatments fetched successfully",
+      data: treatments,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalTreatments,
+        itemsPerPage: limit,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({
+      status: false,
+      message: "Server error while fetching treatments",
+      data: err.message,
+    });
+  }
+};
+
+// get single treatment list
+export const getSingleTreatmentList = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const treatment = await TreatmentList.findById(id).populate("category", "name image");
+
+    if (!treatment) {
+      return res.status(404).json({
+        status: false,
+        message: "Treatment not found",
+        data: null,
+      });
     }
 
     return res.status(200).json({
@@ -128,56 +134,98 @@ export const getIndividualTreatment = async (req, res) => {
       data: treatment,
     });
   } catch (err) {
-    console.error(err);
-    return res
-      .status(500)
-      .json({ message: "Server error", error: err.message });
+    return res.status(500).json({
+      status: false,
+      message: "Server error while fetching treatment",
+      data: err.message,
+    });
   }
 };
 
-// edit treatment list
-export const editTreatmentList = async (req, res) => {
-  // try {
-  //   const { listId } = req.params;
-  //   console.log(listId)
-  //   const { treatments } = req.body;
-  //   console.log(treatments)
+// update treatment list
+export const updateTreatmentList = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, serviceName, description, category } = req.body;
 
-  //   if (!Array.isArray(treatments) || treatments.length === 0) {
-  //     return res.status(400).json({
-  //       status: false,
-  //       message: "Treatments list is required",
-  //       data: null,
-  //     });
-  //   }
+    const treatment = await TreatmentList.findById(id);
+    if (!treatment) {
+      if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      return res.status(404).json({
+        status: false,
+        message: "Treatment not found",
+        data: null,
+      });
+    }
 
-  //   const treatmentList = await TreatmentList.findById(listId);
-  //   if (!treatmentList) {
-  //     return res.status(404).json({
-  //       status: false,
-  //       message: "Treatment list not found",
-  //       data: null,
-  //     });
-  //   }
+    let imageUrl = treatment.image;
+    let cloudinaryId = treatment.cloudinaryId;
 
-  //   treatmentList.treatments = treatments;
+    if (req.file) {
+      await cloudinary.uploader.destroy(treatment.cloudinaryId);
+      const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+        folder: "treatments",
+      });
+      fs.unlinkSync(req.file.path);
+      imageUrl = uploadResult.secure_url;
+      cloudinaryId = uploadResult.public_id;
+    }
 
-  //   await treatmentList.save();
+    treatment.title = title || treatment.title;
+    treatment.serviceName = serviceName || treatment.serviceName;
+    treatment.description = description || treatment.description;
+    treatment.category = category || treatment.category;
+    treatment.image = imageUrl;
+    treatment.cloudinaryId = cloudinaryId;
 
-  //   return res.status(200).json({
-  //     status: true,
-  //     message: "Treatment list updated successfully",
-  //     data: treatmentList,
-  //   });
-  // } catch (err) {
-  //   console.error(err);
-  //   return res
-  //     .status(500)
-  //     .json({
-  //       status: false,
-  //       message: "Server error",
-  //       data: err.message,
-  //     });
-  // }
-  console.log("hello");
+    await treatment.save();
+
+    return res.status(200).json({
+      status: true,
+      message: "Treatment updated successfully",
+      data: treatment,
+    });
+  } catch (err) {
+    console.error("Error updating treatment:", err);
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+    return res.status(500).json({
+      status: false,
+      message: "Server error while updating treatment",
+      data: err.message,
+    });
+  }
+};
+
+// delete treatment list
+export const deleteTreatmentList = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const treatment = await TreatmentList.findById(id);
+
+    if (!treatment) {
+      return res.status(404).json({
+        status: false,
+        message: "Treatment not found",
+        data: null,
+      });
+    }
+
+    // Delete from Cloudinary
+    await cloudinary.uploader.destroy(treatment.cloudinaryId);
+
+    // Delete from DB
+    await TreatmentList.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      status: true,
+      message: "Treatment deleted successfully",
+      data: null,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      status: false,
+      message: "Server error while deleting treatment",
+      data: err.message,
+    });
+  }
 };

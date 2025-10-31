@@ -1,59 +1,38 @@
-// import mongoose from 'mongoose';
-
-// const { Schema, model } = mongoose;
-
-// const treatmentItemSchema = new Schema({
-//   serviceName: {
-//     type: String,
-//     required: true,
-//     trim: true
-//   },
-//   title: {
-//     type: String,
-//     required: true,
-//     trim: true
-//   },
-//   description: {
-//     type: String,
-//     trim: true
-//   },
-//   image: {
-//     type: String,
-//     default: ''
-//   }
-// });
-
-// const treatmentListSchema = new Schema({
-//   treatments: [treatmentItemSchema],
-//   createdAt: {
-//     type: Date,
-//     default: Date.now
-//   }
-// });
-
-// export default model('TreatmentList', treatmentListSchema);
-
 import mongoose from "mongoose";
 
 const { Schema, model } = mongoose;
 
-const treatmentItemSchema = new Schema({
-  serviceName: { type: String, required: true, trim: true },
-  title: { type: String, required: true, trim: true },
-  description: { type: String, trim: true },
-  image: { type: String, default: "" },
-});
-
-const treatmentListSchema = new Schema(
+const treatmentSchema = new Schema(
   {
+    title: {
+      type: String,
+      required: [true, "Treatment title is required"],
+      trim: true,
+    },
+    serviceName: {
+      type: String,
+      required: [true, "Service name is required"],
+      trim: true,
+    },
+    description: {
+      type: String,
+      required: [true, "Description is required"],
+    },
+    image: {
+      type: String,
+      required: [true, "Image is required"],
+    },
+    cloudinaryId: {
+      type: String,
+      required: [true, "Cloudinary ID is required"],
+    },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "TreatmentCategory",
-      required: true,
+      required: [true, "Category reference is required"],
     },
-    treatments: [treatmentItemSchema],
   },
   { timestamps: true }
 );
 
-export default model("TreatmentList", treatmentListSchema);
+export default model("TreatmentList", treatmentSchema);
