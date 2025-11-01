@@ -1,17 +1,17 @@
 import fs from "fs";
-import TreatmentCategory from "../models/treatmentCategory.model.js"
+import TreatmentCategory from "../models/treatmentCategory.model.js";
 import TreatmentList from "../models/treatmentList.model.js";
-import cloudinary from '../utils/cloudinary.js'
+import cloudinary from "../utils/cloudinary.js";
 
 // create treatment list
 export const createTreatmentList = async (req, res) => {
   try {
-    const { title, serviceName, description, category } = req.body;
+    const { serviceName, description, category } = req.body;
 
-    if (!title || !serviceName || !description || !category) {
+    if (!serviceName || !description || !category) {
       return res.status(400).json({
         status: false,
-        message: "All fields (title, serviceName, description, category) are required",
+        message: "Please fill up the required fields",
         data: null,
       });
     }
@@ -111,7 +111,10 @@ export const getAllTreatmentList = async (req, res) => {
 export const getSingleTreatmentList = async (req, res) => {
   try {
     const { id } = req.params;
-    const treatment = await TreatmentList.findById(id).populate("category", "name image");
+    const treatment = await TreatmentList.findById(id).populate(
+      "category",
+      "name image"
+    );
 
     if (!treatment) {
       return res.status(404).json({
@@ -143,7 +146,8 @@ export const updateTreatmentList = async (req, res) => {
 
     const treatment = await TreatmentList.findById(id);
     if (!treatment) {
-      if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      if (req.file && fs.existsSync(req.file.path))
+        fs.unlinkSync(req.file.path);
       return res.status(404).json({
         status: false,
         message: "Treatment not found",
