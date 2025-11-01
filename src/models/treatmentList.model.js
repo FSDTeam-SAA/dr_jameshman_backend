@@ -6,7 +6,6 @@ const treatmentSchema = new Schema(
   {
     title: {
       type: String,
-      required: [true, "Treatment title is required"],
       trim: true,
     },
     serviceName: {
