@@ -445,3 +445,31 @@ export const updateUserImage = async (req, res) => {
     });
   }
 };
+
+// get user by id
+export const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ status: false, message: "User not found", data: null });
+    }
+
+    return res
+      .status(200)
+      .json({
+        status: true,
+        message: "Fetch user infomation successfully",
+        data: user,
+      });
+  } catch (error) {
+    return res.status(500).json({
+      status: false,
+      message: "Error fetching individual user info",
+      data: error.message,
+    });
+  }
+};

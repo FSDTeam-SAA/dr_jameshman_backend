@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   forgotPassword,
+  getUserById,
   loginUser,
   registerUser,
   resetPassword,
@@ -25,5 +26,6 @@ router.route("/update-user/:id").put(isLogegdin, isAdmin, updateUser);
 router
   .route("/update-avatar")
   .post(isLogegdin, isAdmin, upload.single("avatar"), updateUserImage);
+router.route("/:id").get(getUserById);
 
 export default router;
