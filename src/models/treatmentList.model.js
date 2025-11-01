@@ -4,10 +4,6 @@ const { Schema, model } = mongoose;
 
 const treatmentSchema = new Schema(
   {
-    title: {
-      type: String,
-      trim: true,
-    },
     serviceName: {
       type: String,
       required: [true, "Service name is required"],

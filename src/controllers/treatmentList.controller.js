@@ -43,7 +43,6 @@ export const createTreatmentList = async (req, res) => {
     fs.unlinkSync(localFilePath);
 
     const treatment = await TreatmentList.create({
-      title,
       serviceName,
       description,
       image: uploadResult.secure_url,
@@ -142,7 +141,7 @@ export const getSingleTreatmentList = async (req, res) => {
 export const updateTreatmentList = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, serviceName, description, category } = req.body;
+    const { serviceName, description, category } = req.body;
 
     const treatment = await TreatmentList.findById(id);
     if (!treatment) {
@@ -168,7 +167,6 @@ export const updateTreatmentList = async (req, res) => {
       cloudinaryId = uploadResult.public_id;
     }
 
-    treatment.title = title || treatment.title;
     treatment.serviceName = serviceName || treatment.serviceName;
     treatment.description = description || treatment.description;
     treatment.category = category || treatment.category;
