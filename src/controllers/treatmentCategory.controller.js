@@ -58,9 +58,11 @@ export const createTreatmentCategory = async (req, res) => {
     });
   } catch (error) {
     if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-    return res
-      .status(500)
-      .json({ status: false, message: "Server error", data: error.message });
+    return res.status(500).json({
+      status: false,
+      message: "Internal server error",
+      data: error.message,
+    });
   }
 };
 
@@ -81,7 +83,7 @@ export const getAllCategories = async (req, res) => {
 
     return res.status(200).json({
       status: true,
-      mnessage: "Fetach all treatment categories successfully",
+      mnessage: "Fetch all treatment categories successfully",
       data: categories,
       pagination: {
         currentPage: page,
@@ -91,9 +93,11 @@ export const getAllCategories = async (req, res) => {
       },
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ status: false, message: "Server error", data: error.message });
+    return res.status(500).json({
+      status: false,
+      message: "Internal server error",
+      data: error.message,
+    });
   }
 };
 
@@ -117,9 +121,11 @@ export const getSingleCategory = async (req, res) => {
       data: category,
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ status: false, message: "Server error", data: error.message });
+    return res.status(500).json({
+      status: false,
+      message: "Internal server error",
+      data: error.message,
+    });
   }
 };
 
@@ -144,13 +150,11 @@ export const updateCategory = async (req, res) => {
     );
 
     if (!updated)
-      return res
-        .status(404)
-        .json({
-          status: false,
-          message: "Treatment category not found",
-          data: null,
-        });
+      return res.status(404).json({
+        status: false,
+        message: "Treatment category not found",
+        data: null,
+      });
 
     return res.status(200).json({
       status: true,
@@ -158,9 +162,11 @@ export const updateCategory = async (req, res) => {
       data: updated,
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ status: false, message: "Server error", data: error.message });
+    return res.status(500).json({
+      status: false,
+      message: "Internal server error",
+      data: error.message,
+    });
   }
 };
 
@@ -182,8 +188,10 @@ export const deleteCategory = async (req, res) => {
       data: null,
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ status: false, message: "Server error", data: error.message });
+    return res.status(500).json({
+      status: false,
+      message: "Internal server error",
+      data: error.message,
+    });
   }
 };

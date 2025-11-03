@@ -35,12 +35,10 @@ export const createFAQ = async (req, res) => {
       data: newFAQ,
     });
   } catch (err) {
-    console.error(err);
     return res.status(500).json({
       status: false,
-      message: "Server error",
-      error: err.message,
-      data: null,
+      message: "Internal server error",
+      data: err.message,
     });
   }
 };
@@ -73,12 +71,10 @@ export const getAllFAQs = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(err);
     return res.status(500).json({
       status: false,
-      message: "Server error",
-      error: err.message,
-      data: null,
+      message: "Internal server error",
+      data: err.message,
     });
   }
 };
@@ -99,15 +95,13 @@ export const getSingleFAQ = async (req, res) => {
     return res.status(200).json({
       status: true,
       message: "FAQ fetched successfully",
-      faq: faq,
+      data: faq,
     });
   } catch (err) {
-    console.error(err);
     return res.status(500).json({
       status: false,
-      message: "Server error",
-      error: err.message,
-      data: null,
+      message: "Internal server error",
+      data: err.message,
     });
   }
 };
@@ -119,9 +113,11 @@ export const editFAQ = async (req, res) => {
     const { question, answer } = req.body;
 
     if (!question || !answer) {
-      return res
-        .status(400)
-        .json({ status: false, message: "Question and answer are required" });
+      return res.status(400).json({
+        status: false,
+        message: "Question and answer are required",
+        data: null,
+      });
     }
 
     const faq = await FAQ.findById(faqId);
@@ -139,15 +135,14 @@ export const editFAQ = async (req, res) => {
     return res.status(200).json({
       status: true,
       message: "FAQ updated successfully",
-      faq: faq,
+      data: faq,
     });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
       status: false,
-      message: "Server error",
-      error: err.message,
-      data: null,
+      message: "Internal server error",
+      data: err.message,
     });
   }
 };
