@@ -12,12 +12,10 @@ const contactScheme = new Schema(
     email: {
       type: String,
       require: true,
-      unique: true,
     },
     phone: {
       type: String,
       required: true,
-      unique: true,
     },
     message: {
       type: String,
