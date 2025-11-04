@@ -61,7 +61,7 @@ export const registerUser = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       status: false,
       message: "Server error during registration",
       data: error.message,
@@ -78,6 +78,7 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({
         status: false,
         message: "Email and password are required",
+        data: null,
       });
     }
 
@@ -86,6 +87,7 @@ export const loginUser = async (req, res) => {
       return res.status(404).json({
         status: false,
         message: "User not found",
+        data: null,
       });
     }
 
@@ -94,6 +96,7 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({
         status: false,
         message: "Invalid password",
+        data: null,
       });
     }
 
@@ -281,7 +284,7 @@ export const updatePassword = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       status: false,
-      message: "Error resetting password",
+      message: "Server error resetting password",
       data: error.message,
     });
   }
@@ -390,7 +393,7 @@ export const updateUser = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       status: false,
-      message: "Error updating user",
+      message: "Server error updating user",
       data: error.message,
     });
   }
@@ -440,7 +443,7 @@ export const updateUserImage = async (req, res) => {
     if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     return res.status(500).json({
       status: false,
-      message: "Error updating user image",
+      message: "Server error while updating user image",
       data: error.message,
     });
   }
@@ -458,17 +461,15 @@ export const getUserById = async (req, res) => {
         .json({ status: false, message: "User not found", data: null });
     }
 
-    return res
-      .status(200)
-      .json({
-        status: true,
-        message: "Fetch user infomation successfully",
-        data: user,
-      });
+    return res.status(200).json({
+      status: true,
+      message: "Fetch user infomation successfully",
+      data: user,
+    });
   } catch (error) {
     return res.status(500).json({
       status: false,
-      message: "Error fetching individual user info",
+      message: "Server error fetching individual user info",
       data: error.message,
     });
   }

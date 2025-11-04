@@ -83,14 +83,11 @@ export const createBooking = async (req, res) => {
       data: newBooking,
     });
   } catch (err) {
-    console.error("Error creating booking:", err);
-
     if (err.code === 11000) {
       return res.status(409).json({
         status: false,
         message: "Duplicate entry detected. Please check your submission",
-        error: err.message,
-        data: null,
+        data: err.message,
       });
     }
 
@@ -206,8 +203,7 @@ export const deleteBooking = async (req, res) => {
     return res.status(500).json({
       status: false,
       message: "Server error while deleting booking",
-      error: err.message,
-      data: null,
+      data: err.message,
     });
   }
 };

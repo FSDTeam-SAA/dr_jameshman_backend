@@ -56,15 +56,13 @@ export const createTreatmentList = async (req, res) => {
       data: treatment,
     });
   } catch (error) {
-    console.error("Error creating treatment:", error);
-
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
 
     return res.status(500).json({
       status: false,
-      message: "Server error",
+      message: "Internal server error",
       error: error.message,
     });
   }
@@ -224,44 +222,10 @@ export const deleteTreatmentList = async (req, res) => {
 };
 
 //  get treatment list by category Id
-// export const getTreatmentListByCategory = async (req, res) => {
-//  try {
-//     const { categoryId } = req.params;
-
-//     const category = await TreatmentCategory.findById(categoryId);
-//     if (!category) {
-//       return res.status(404).json({
-//         status: false,
-//         message: "Category not found",
-//         data: null,
-//       });
-//     }
-
-//     const treatments = await TreatmentList.find({ category: categoryId }).sort({ createdAt: -1 });
-
-//     return res.status(200).json({
-//       status: true,
-//       message: "Treatments fetched successfully for this category",
-//       data: {
-//         category,
-//         treatments,
-//       },
-//     });
-//   } catch (error) {
-//     console.error("Error fetching treatments by category:", error);
-//     return res.status(500).json({
-//       status: false,
-//       message: "Server error while fetching treatments",
-//       data: error.message,
-//     });
-//   }
-// };
-
 export const getTreatmentListByCategory = async (req, res) => {
   try {
     const { categoryId } = req.params;
 
-    // 1️⃣ Check if category exists
     const category = await TreatmentCategory.findById(categoryId);
     if (!category) {
       return res.status(404).json({
@@ -271,12 +235,10 @@ export const getTreatmentListByCategory = async (req, res) => {
       });
     }
 
-    // 2️⃣ Find all treatments associated with this category
     const treatments = await TreatmentList.find({ category: categoryId })
-      .populate("category", "name image") // optional: include category info
+      .populate("category", "name image")
       .sort({ createdAt: -1 });
 
-    // 3️⃣ Return response
     return res.status(200).json({
       status: true,
       message: "Treatments fetched successfully for this category",
@@ -286,7 +248,6 @@ export const getTreatmentListByCategory = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching treatments by category:", error);
     return res.status(500).json({
       status: false,
       message: "Server error while fetching treatments by category",

@@ -2,22 +2,25 @@ import mongoose from "mongoose";
 
 const gallerySchema = new mongoose.Schema(
   {
-    imageName: {
-      type: String,
-      required: [true, "Image name is required"],
-      trim: true,
+    before: {
+      imageName: {
+        type: String,
+        required: [true, "Image for before section is required"],
+        trim: true,
+      },
+      cloudinaryId: {
+        type: String,
+      },
     },
-    imageDescription: {
-      type: String,
-      trim: true,
-    },
-    imageUrl: {
-      type: String,
-      required: [true, "Image URL is required"],
-    },
-    cloudinaryId: {
-      type: String,
-      required: [true, "Cloudinary ID is required"],
+    after: {
+      imageName: {
+        type: String,
+        required: [true, "Image for after section is required"],
+        trim: true,
+      },
+      cloudinaryId: {
+        type: String,
+      },
     },
   },
   { timestamps: true }

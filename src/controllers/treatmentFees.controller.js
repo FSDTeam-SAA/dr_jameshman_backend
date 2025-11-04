@@ -23,7 +23,11 @@ export const createTreatmentFee = async (req, res) => {
       }
     }
 
-    const treatmentFee = await TreatmentFee.create({ serviceName, items, currency });
+    const treatmentFee = await TreatmentFee.create({
+      serviceName,
+      items,
+      currency,
+    });
 
     return res.status(201).json({
       status: true,
@@ -49,7 +53,10 @@ export const getAllTreatmentFees = async (req, res) => {
     const totalFees = await TreatmentFee.countDocuments();
     const totalPages = Math.ceil(totalFees / limit);
 
-    const fees = await TreatmentFee.find().skip(skip).limit(limit).sort({ createdAt: -1 });
+    const fees = await TreatmentFee.find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     return res.status(200).json({
       status: true,

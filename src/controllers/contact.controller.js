@@ -50,8 +50,7 @@ export const createContact = async (req, res) => {
     return res.status(500).json({
       status: false,
       message: "Server error",
-      error: err.message,
-      data: null,
+      data: err.message,
     });
   }
 };
@@ -89,8 +88,7 @@ export const getAllContacts = async (req, res) => {
     return res.status(500).json({
       status: false,
       message: "Server error",
-      error: err.message,
-      data: null,
+      data: err.message,
     });
   }
 };
@@ -109,13 +107,15 @@ export const getSingleContact = async (req, res) => {
     return res.status(200).json({
       status: true,
       message: "Contact fetched successfully",
-      contact: contact,
+      data: contact,
     });
   } catch (err) {
     console.error(err);
-    return res
-      .status(500)
-      .json({ message: "Server error", error: err.message });
+    return res.status(500).json({
+      status: false,
+      message: "Internal server error",
+      data: err.message,
+    });
   }
 };
 
@@ -139,13 +139,10 @@ export const deleteContact = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    return res
-      .status(500)
-      .json({
-        status: false,
-        message: "Server error",
-        error: err.message,
-        data: null,
-      });
+    return res.status(500).json({
+      status: false,
+      message: "Internal server error",
+      data: err.message,
+    });
   }
 };
