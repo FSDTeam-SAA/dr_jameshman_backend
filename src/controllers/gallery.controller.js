@@ -22,6 +22,8 @@ export const createGallery = async (req, res) => {
       folder: "gallery",
     });
 
+    console.log(beforeUpload);
+
     const afterUpload = await cloudinary.uploader.upload(afterPath, {
       folder: "gallery",
     });
@@ -31,11 +33,13 @@ export const createGallery = async (req, res) => {
 
     const gallery = await Gallery.create({
       before: {
-        imageName: before[0].originalname,
+        // imageName: before[0].originalname,
+        imageName: beforeUpload.secure_url,
         cloudinaryId: beforeUpload.public_id,
       },
       after: {
-        imageName: after[0].originalname,
+        // imageName: after[0].originalname,
+        imageName: afterUpload.secure_url,
         cloudinaryId: afterUpload.public_id,
       },
     });
