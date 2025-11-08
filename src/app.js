@@ -10,6 +10,7 @@ import userRouter from "./routes/user.routes.js";
 import referralRouter from "./routes/referral.routes.js";
 import treatmentCategoryRouter from "./routes/treatmentCategory.routes.js";
 import doctorRouter from "./routes/doctor.routes.js";
+import contactInfoRouter from "./routes/contactInfo.routes.js";
 
 const app = express();
 
@@ -51,5 +52,8 @@ app.use("/api/v1/treatmentCategories", treatmentCategoryRouter);
 
 // doctor routes
 app.use("/api/v1/doctors", doctorRouter);
+
+// contact info routes
+app.use("/api/v1/contact-info", contactInfoRouter);
 
 export default app;
