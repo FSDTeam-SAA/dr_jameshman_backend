@@ -35,7 +35,7 @@ export const createBooking = async (req, res) => {
     if (!emailRegex.test(email)) {
       return res.status(400).json({
         status: false,
-        message: "Please provide a valid email address.",
+        message: "Please provide a valid email address",
         data: null,
       });
     }
@@ -44,6 +44,15 @@ export const createBooking = async (req, res) => {
       return res.status(400).json({
         status: false,
         message: "You must give consent before booking",
+        data: null,
+      });
+    }
+
+    const allowedTimes = ["anytime", "morning", "midday", "afternoon", "night"];
+    if (!allowedTimes.includes(preferredTime)) {
+      return res.status(400).json({
+        status: false,
+        message: "Invalid preferred time option",
         data: null,
       });
     }
@@ -93,7 +102,7 @@ export const createBooking = async (req, res) => {
 
     return res.status(500).json({
       status: false,
-      message: "Server error while creating booking.",
+      message: "Server error while creating booking",
       data: err.message,
     });
   }
