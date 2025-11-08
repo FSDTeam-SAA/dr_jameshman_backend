@@ -1,6 +1,7 @@
 import fs from "fs";
 import cloudinary from "cloudinary";
 import TreatmentCategory from "../models/treatmentCategory.model.js";
+import treatmentListModel from "../models/treatmentList.model.js";
 
 // create treatment category
 export const createTreatmentCategory = async (req, res) => {
@@ -174,17 +175,22 @@ export const updateCategory = async (req, res) => {
 export const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const deleted = await TreatmentCategory.findByIdAndDelete(id);
-    if (!deleted)
+
+    // Delete the TreatmentCategory document by its ID
+    const deletedCategory = await TreatmentCategory.findByIdAndDelete(id);
+    if (!deletedCategory) {
       return res.status(404).json({
         status: false,
         message: "Treatment category not found",
         data: null,
       });
+    }
+
+    await treatmentListModel.deleteMany({ category: id });
 
     return res.status(200).json({
       status: true,
-      message: "Treatment category deleted",
+      message: "Treatment category and related treatments deleted",
       data: null,
     });
   } catch (error) {
