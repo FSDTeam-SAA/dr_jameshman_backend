@@ -11,6 +11,7 @@ import referralRouter from "./routes/referral.routes.js";
 import treatmentCategoryRouter from "./routes/treatmentCategory.routes.js";
 import doctorRouter from "./routes/doctor.routes.js";
 import contactInfoRouter from "./routes/contactInfo.routes.js";
+import privacyPolicyRouter from "./routes/privacy.policy.routes.js";
 
 const app = express();
 
@@ -55,5 +56,8 @@ app.use("/api/v1/doctors", doctorRouter);
 
 // contact info routes
 app.use("/api/v1/contact-info", contactInfoRouter);
+
+// privacy policy routes
+app.use("/api/v1/privacy-policy", privacyPolicyRouter);
 
 export default app;
