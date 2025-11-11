@@ -12,6 +12,7 @@ import treatmentCategoryRouter from "./routes/treatmentCategory.routes.js";
 import doctorRouter from "./routes/doctor.routes.js";
 import contactInfoRouter from "./routes/contactInfo.routes.js";
 import privacyPolicyRouter from "./routes/privacy.policy.routes.js";
+import termOfServiceRouter from "./routes/terms.service.routes.js";
 
 const app = express();
 
@@ -59,5 +60,8 @@ app.use("/api/v1/contact-info", contactInfoRouter);
 
 // privacy policy routes
 app.use("/api/v1/privacy-policy", privacyPolicyRouter);
+
+// terms of service routes
+app.use("/api/v1/terms-service", termOfServiceRouter);
 
 export default app;
